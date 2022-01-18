@@ -8,46 +8,54 @@ import {
   View,
   Modal,
   Alert,
+  TouchableOpacity,
 } from 'react-native';
 import {FAB} from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import {BarChart, Grid} from 'react-native-svg-charts';
+import { Icon } from 'react-native-paper/lib/typescript/components/Avatar/Avatar';
 
 const HeartBeat = () => {
   const [heartBeat, setheartBeat] = useState('');
   const [data, setData] = useState([]);
   const [date, setDate] = useState(new Date());
   const [open, setOpen] = useState(false);
+  const [bar, setBar] = useState(false);
 
   const [modal, setModal] = useState(false);
   const getData = {inputData: heartBeat, time: date};
 
+  const fill='rgb(29, 165, 244)';
+  const barData=[...data.map((data)=>data.inputData)];
+
+
+  const loadGraphData=()=>{
+    setBar(true)
+ // barData=[70,30,20,40,70]
+    // barData=data.map((data,index)=>{return(data.inputData)})
+    console.log('bardata',barData)
+    console.log(data)
+  }
+
   const getday = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setDate(currentDate);
-    console.log(
-      currentDate.getDate() + currentDate.getDay() + currentDate.getFullYear(),
-    );
+   
     setOpen(false);
   };
 
   const addHeartRate = () => {
     // console.log()
-    if (heartBeat){
-    setData([...data, getData]);
-    setheartBeat('')
-    setModal(false);
-    }
-    else {
-      alert('please add data')
+    if (heartBeat) {
+      setData([...data, getData]);
+      setheartBeat('');
+      setModal(false);
+    } else {
+      alert('please add data');
     }
   };
-  // const inputData={
-  //   heartBeat:{data:130},
-  //   spO2:{data:98},
-  //   heartBeat:{data:80}
-  // }
+ // console.log(data)
 
-  //console.log(heartBeat)
   return (
     <View style={styles.container}>
       <View
@@ -55,38 +63,41 @@ const HeartBeat = () => {
           flexDirection: 'row',
           justifyContent: 'space-between',
           margin: 15,
+          
         }}>
-        <Text>S.No</Text>
-        <Text>Date</Text>
-        <Text>HeartBeat</Text>
+        <Text style={{color:'grey'}}>S.No</Text>
+        <Text style={{color:'grey'}}>Date</Text>
+        <Text style={{color:'grey'}}>HeartBeat</Text>
       </View>
-      <ScrollView>
-        {data.map((elm, index) => {
-          return (
-            <View key={index} style={styles.content}>
-              <View>
-                <Text style={{fontSize: 20, color: '#000'}}>
-                  {index + 1 + '.'}
-                </Text>
+      <View style={{flex: 2.5}}>
+        <ScrollView>
+          {data.map((elm, index) => {
+            return (
+              <View key={index} style={styles.content}>
+                <View>
+                  <Text style={{fontSize: 20, color: '#000'}}>
+                    {index + 1 + '.'}
+                  </Text>
+                </View>
+                <View>
+                  <Text
+                    style={{
+                      fontSize: 25,
+                      color: '#000',
+                    }}>{`${elm.time.getDate()}/${
+                    elm.time.getMonth() + 1
+                  }/${elm.time.getFullYear()}`}</Text>
+                </View>
+                <View>
+                  <Text style={{fontSize: 30, color: '#000'}}>
+                    {elm.inputData}
+                  </Text>
+                </View>
               </View>
-              <View>
-                <Text
-                  style={{
-                    fontSize: 25,
-                    color: '#000',
-                  }}>{`${elm.time.getDate()}/${
-                  elm.time.getMonth() + 1
-                }/${elm.time.getFullYear()}`}</Text>
-              </View>
-              <View>
-                <Text style={{fontSize: 30, color: '#000'}}>
-                  {elm.inputData}
-                </Text>
-              </View>
-            </View>
-          );
-        })}
-      </ScrollView>
+            );
+          })}
+        </ScrollView>
+      </View>
       <View>
         <Modal visible={modal} transparent={true}>
           <View
@@ -121,10 +132,36 @@ const HeartBeat = () => {
             </View>
           </View>
         </Modal>
+        <Modal visible={bar} transparent={true}>
+        <View
+            style={{
+              backgroundColor: '#000000aa',
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+          <View style={styles.barView}>
+         
+          <TouchableOpacity style={styles.barClose} onPress={()=>setBar(false)}><Text>❌ </Text></TouchableOpacity>
+          <BarChart style={{ height: 300,marginTop:30 }} data={barData} svg={{ fill }} contentInset={{ top: 30, bottom: 30 }}>
+
+
+          <Grid />
+      </BarChart>
+          </View>
+          </View>
+        </Modal>
       </View>
-      <View style={{flex: 2}}>
+
+      <View style={{flex: 1}}>
         <FAB
-          style={styles.fab}
+          style={styles.fabBar}
+          medium
+          icon="chart-bar"
+          onPress={() => loadGraphData()}
+        />
+        <FAB
+          style={styles.fabAdd}
           medium
           icon="plus"
           onPress={() => setModal(true)}
@@ -139,6 +176,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    fontFamily: 'Roboto-Black',
   },
   content: {
     backgroundColor: '#ffffff',
@@ -146,6 +184,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
     flexDirection: 'row',
+    // fontFamily:'Roboto-Black'
 
     margin: 10,
     padding: 10,
@@ -168,11 +207,17 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
 
-  fab: {
+  fabAdd: {
     position: 'absolute',
-    margin: 20,
+    margin: 10,
     right: 0,
     bottom: 0,
+  },
+  fabBar: {
+    position: 'absolute',
+    margin: 10,
+    right: 0,
+    bottom: 65,
   },
   modalView: {
     backgroundColor: '#ffffff',
@@ -183,4 +228,18 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     width: '80%',
   },
+  barView: {
+    backgroundColor: '#ffffff',
+    height: 450,
+    padding: 20,
+    marginTop: 40,
+   // justifyContent: 'space-around',
+    borderRadius: 6,
+    width: '80%',
+  },
+  barClose:{
+    position: 'absolute',
+    margin: 20,
+    right: 0,
+  }
 });

@@ -1,13 +1,22 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {  Button,
     ScrollView,
     StyleSheet,
     Text,
     TextInput,
     View,
-    Modal, } from 'react-native';
+    Modal,
+    TouchableOpacity, } from 'react-native';
     import {FAB} from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import {
+  
+  BarChart,
+ 
+} from "react-native-chart-kit";
+
+
+
 
 const Temperature = () => {
 
@@ -16,19 +25,20 @@ const Temperature = () => {
   const [date, setDate] = useState(new Date());
   const [open, setOpen] = useState(false);
   const [modal, setModal] = useState(false);
+  const [bar, setBar] = useState(false);
+
+
   const getData = {inputData: temp, time: date};
 
   const getday = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setDate(currentDate);
-    console.log(
-      currentDate.getDate() + currentDate.getDay() + currentDate.getFullYear(),
-    );
+    
     setOpen(false);
   };
 
   const addTemp = () => {
-    // console.log()
+    
     if(temp){
     setData([...data, getData]);
     setTemp('')
@@ -40,6 +50,52 @@ const Temperature = () => {
   };
 
 
+  // let barData = {
+  //   labels: [],
+  //   datasets: [
+  //     {
+  //       data:[{
+  //         data.map((data)=>data.inputData)}]
+  //     }
+  //   ]
+  // };
+  
+   const chartConfig = {
+    backgroundColor: "#fff",
+      backgroundGradientFrom: "#238c00",
+      backgroundGradientTo: "#8ddef6",
+      decimalPlaces: 2, // optional, defaults to 2dp
+      color: (opacity = 0.8) => `rgba(32, 36, 36, ${opacity})`,
+      labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+      style: {
+        borderRadius: 16
+      },
+      propsForDots: {
+        r: "8",
+        strokeWidth: "6",
+        stroke: "#fea726"
+      }
+    
+    
+   
+   };
+  const  showGraph=()=>{
+    // barData.labels=data.map((data)=>data.time.getDate())
+    // barData.datasets[0].data=data.map((data)=>data.inputData)
+    // console.log(barData.labels)
+    // console.log(barData.datasets[0].data)
+    setBar(true)
+
+  }
+  // useEffect(() => {
+  //   console.log(barData.labels)
+
+  //   console.log(barData.datasets[0].data)
+
+    
+  // }, [data])
+
+
     return (
         <View style={styles.container}>
         <View
@@ -48,9 +104,9 @@ const Temperature = () => {
             justifyContent: 'space-between',
             margin: 15,
           }}>
-          <Text>S.No</Text>
-          <Text>Date</Text>
-          <Text>Temperature</Text>
+          <Text style={{color:'grey'}}>S.No</Text>
+          <Text style={{color:'grey'}}>Date</Text>
+          <Text style={{color:'grey'}}>Temperature</Text>
         </View>
         <ScrollView>
           {data.map((elm, index) => {
@@ -113,8 +169,47 @@ const Temperature = () => {
               </View>
             </View>
           </Modal>
+          <Modal visible={bar} transparent={true}>
+          <View
+              style={{
+                backgroundColor: '#000000aa',
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+            <View style={styles.barView}>
+           
+            <TouchableOpacity style={styles.barClose} onPress={()=>setBar(false)}><Text>❌ </Text></TouchableOpacity>
+            <BarChart
+          ///style={graphStyle}
+            data={{
+              labels:[
+                ...data.map((elm)=>elm.time.getDate())
+              ],
+              datasets:[{
+                data:data.map((elm)=>elm.inputData)
+              }]
+            }}
+            width={270}
+            height={400}
+            yAxisLabel=""
+            //xAxisLabel={data.map((elm)=>elm.time.toLocaleString("en-US", { month: "short" }))}
+            chartConfig={chartConfig}
+            verticalLabelRotation={30}
+            style={{ height: 250 }}
+          />
+            </View>
+            </View>
+          </Modal>
         </View>
-        <View style={{flex: 2}}>
+        <View style={{flex: 1}}>
+        <FAB
+        style={styles.fabBar}
+        medium
+        icon="chart-bar"
+        onPress={() => showGraph()}
+      />
+      
           <FAB
             style={styles.fab}
             medium
@@ -162,9 +257,15 @@ const Temperature = () => {
   
     fab: {
       position: 'absolute',
-      margin: 20,
+      margin: 10,
       right: 0,
       bottom: 0,
+    },
+    fabBar: {
+      position: 'absolute',
+    margin: 10,
+    right: 0,
+    bottom: 65,
     },
     modalView: {
       backgroundColor: '#ffffff',
@@ -175,6 +276,19 @@ const Temperature = () => {
       borderRadius: 6,
       width: '80%',
     },
+    barView: {
+      backgroundColor: '#ffffff',
+      height: 450,
+      padding: 20,
+      marginTop: 30,
+           borderRadius: 6,
+      width: '85%',
+    },
+    barClose:{
+      position: 'absolute',
+      margin: 20,
+      right: 0,
+    }
   });
   
   

@@ -29,7 +29,7 @@ const SpO2 = () => {
     };
   
     const addSpO2 = () => {
-      // console.log()
+     
       if(spO2){
       setData([...data, getData]);
       setSpO2('')
@@ -49,9 +49,9 @@ const SpO2 = () => {
               justifyContent: 'space-between',
               margin: 15,
             }}>
-            <Text>S.No</Text>
-            <Text>Date</Text>
-            <Text>SpO2</Text>
+            <Text style={{color:'grey'}}>S.No</Text>
+            <Text style={{color:'grey'}}>Date</Text>
+            <Text style={{color:'grey'}}>SpO2</Text>
           </View>
           <ScrollView>
             {data.map((elm, index) => {
